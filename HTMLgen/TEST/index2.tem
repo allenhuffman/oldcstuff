@@ -1,0 +1,17 @@
+#define DEBUG try 1
+#define SPAM
+<!-- TEMPLATE START -->
+And away we go...
+#ifdef TEST
+"%TEST%" was passed in as the value for TEST.
+#else
+TEST was not defined from the command line.
+#endif
+#ifdef DEBUG
+This is a debug line.
+#endif
+...done.
+#define DEBUG try 2
+#define DEBUG try 3
+Debug: %DEBUG%
+<!-- TEMPLATE END -->

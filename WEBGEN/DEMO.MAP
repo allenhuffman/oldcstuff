@@ -1,0 +1,16 @@
+*
+* This is a sample .map file
+* (Format: "n,s,w,e")
+*
+* Map:      [1]--[2]
+*            |    |
+*           [3]--[4]--[5]
+*
+0,3,0,2 * room 1, East goes to room 2, South goes to room 3
+    IMAGES=ndoor,sdoor,wdoor,edoor
+    DESC=You are in a really cool place, don'tcha think?
+0,4,1,0 * room 2, South goes to Room 4, West goes to room 1
+1,0,0,4 * room 3, North goes to room 1, East goes to room 4
+    DESC=This is a place also.
+2,0,3,5 * room 4, North goes to 2, East goes to 5, West goes to 3
+0,0,4,0 * room 5, West goes to room 4

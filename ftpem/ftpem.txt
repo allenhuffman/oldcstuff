@@ -1,0 +1,68 @@
+-------------------------------------------------------------------------------
+FTPem by Allen Huffman (subetha@pobox.com)
+http://www.pobox.com/~subetha/programs.html
+-------------------------------------------------------------------------------
+PROGRAM SYNTAX
+
+Syntax: ftpem ftp.server.com username password file {file} {...}
+Usage : Batch transfers files to an ftp site one file at a time.
+Opts  : -? or /? = display this message.
+-------------------------------------------------------------------------------
+WHAT IS IT?
+
+FTPem is a simple DOS based utility I wrote to overcome a particular
+problem dealing with an ftp site that hosts my web page.  The problem
+was that, for some reason, the site got to where it would disconnect on
+me if I tried to send more than just a few files at a time, meaning I
+was left with the rather laborous chore of ftping each file one at a
+time.  Since I believe typing a quick command line is almost always
+faster than navigating dozens of pull down and pop up windows, I wrote a
+short program to take the work out of FTPing for me.
+-------------------------------------------------------------------------------
+EXAMPLE
+
+Suppose I had a directory called "C:\ALS\HTML" which contained all my
+.html files for my web site.  If I wanted to send them all to a site
+from the command line (using this program), I could simply type:
+
+    C:\ALS\HTML> ftpem ftp.server.com allen mypassword *.*
+
+This would proceed to transfer ALL of the files in the current directory
+to the server called "ftp.server.com", logging in as username "allen"
+with a password of "mypassword".  To send just the .html files, you
+might use:
+
+    C:\ALS\HTML> ftpem ftp.server.com allen mypassword *.html
+
+To send only specific files, or any mixture, you can also use:
+
+    C:\ALS\HTML> ftpem ftp.server.com allen mypassword file.html *.gif *.jpg
+
+Easy, eh?
+-------------------------------------------------------------------------------
+LIMITATIONS
+
+Note that the current version does *NOT* support recursion.  It only
+puts in the files in the directory you are in.  If someone wants me to
+add this, I can.  Also, note that it opens and closes the ftp site for
+each and every file.  This is slower - but for my use it was required. 
+I may add an option to bypass this if someone asks me to.
+-------------------------------------------------------------------------------
+REQUIREMENTS
+
+FTPem doesn't implement an ftp client on it's own.  Instead, it uses the
+"secret" command line client that comes with Windows 95.  This file must
+be on your PATH or in the current directory when you execute this
+utility or else it won't work.
+-------------------------------------------------------------------------------
+REGISTRATION
+
+This is a free program.  If you would like to thank me with money, I
+won't turn you down.  Send whatever you think it's worth ($5 would be
+real nice, I think) to:
+
+    Allen Huffman
+    P.O. Box 22031
+    Des Moines, IA  50325
+-------------------------------------------------------------------------------
+

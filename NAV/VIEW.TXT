@@ -1,0 +1,189 @@
+Proposal:  An HTML code generator that will create index pages similar
+to those in use at the Toshiba support site:
+
+    http://www.csd.toshiba.com/tais/csd/support/ServiceSupport.html
+
+A text file will be parsed to create various forms of the tree view.
+
+nav_main.html
+
+ +----Help
+ |
+[+]---Category 1
+ |
+[+]---Category 2
+ |
+[+]---Category 3
+
+If they click on the "[+]" next to "Category 1", it expands by showing
+this HTML file:
+
+nav_category1.html
+
+ +----Help
+ |
+[-]---Category 1
+ |  |
+ | [+]---Topic 1
+ |  |
+ | [+]---Topic 2
+ |  |
+ | [+]---Topic 3
+ |
+[+]---Category 2
+ |
+[+]---Category 3
+
+Then if the user were to click the "[+]" next to "Topic 2", they would
+be sent to the following HTML file:
+
+nav_category1_topic2.html
+
+ +----Help
+ |
+[-]---Category 1
+ |  |
+ | [+]---Topic 1
+ |  |
+ | [-]---Topic 2
+ |  |  |
+ |  | [+]---Subtopic 1
+ |  |  |
+ |  | [+]---Subtopic 2
+ |  |
+ | [+]---Topic 3
+ |
+[+]---Category 2
+ |
+[+]---Category 3
+
+At this point, let's say they clicked on the "[+]" next to "Subtopic 2",
+which would take them to this HTML file:
+
+nav_category1_topic2_subtopic2.html
+
+ +----Help
+ |
+[-]---Category 1
+ |  |
+ | [+]---Topic 1
+ |  |
+ | [-]---Topic 2
+ |  |  |
+ |  | [+]---Subtopic 1
+ |  |  |
+ |  | [-]---Subtopic 2
+ |  |     |
+ |  |     |---Item 1
+ |  |     |---Item 2
+ |  |     |---Item 3
+ |  |
+ | [+]---Topic 3
+ |
+[+]---Category 2
+ |
+[+]---Category 3
+
+The possible files generated would include at the minimum:
+
+nav_categoryX.html
+nav_categoryX_topicY.html
+nav_vategoryX_topicY_subtopicZ.html
+
+...where X is the number of categories, and one for each category.  Y is
+the number of topics.  Z is the number of subtopics.  For my small
+example, assuming all were identical, we'd have:
+
+nav_category1.html
+nav_category1_topic1.html
+nav_category1_topic1_subtopic1.html
+nav_category1_topic1_subtopic2.html
+nav_category1_topic2.html
+nav_category1_topic2_subtopic1.html
+nav_category1_topic2_subtopic2.html
+
+...then repeat above using "category2" and again using "category3".
+
+If desired, the processor could even create enough HTML files for every
+possible combination, though that seems like such overkill.  (Though it
+might be a neat thing since most sites do not allow this without
+resorting to gratuitious uses of Java or CGI.)  The only branches that
+would ever be open would be those selected, and selecting outside would
+close the previously open ones.  This, now that I come to think about
+it, is a bit annoying, but certainly not too bad.  'course, it does make
+me think that perhaps having "all" the possible combinations available
+might be a nifty idea, server space permitting.  (Mental note:  Make the
+processor allow this option ;)  A fully expanded file should also be
+made available, such as nav_all.html.  (Or, perhaps, instead of
+nav_main.html having nav_colapsed.html and nav_expanded.html?)
+
+An actual example for Microware's support web site might look like this:
+
+nav_68k_downloads_utilities.html
+
+[-]---68K
+ |  |
+ | [+]---App Notes
+ |  |
+ | [-]---Downloads
+ |  |  |
+ |  | [-]---Utilities
+ |  |     |
+ |  |     |---PC Hosted
+ |  |     |---Unix Hosted
+ |  |     |---OS-9 Hosted
+ |  |
+ | [+]---Patches/Updates
+
+nav_68k_downloads_utilities.html
+
+Clicking on any of the subtopic items would bring up a full screen index
+page (or, when in "frame" mode, the index page in the right large
+frame).  This would have a full listing of items available in normal web
+page format.  No special HTML generating program would likely be needed
+for this, unless we really wanted to customize things.
+
+A sample of what the "raw" text file that the processor reads might look
+like the following.  Topics are divided up, and then final items that
+load full .html files have their file name specified.
+
+Category 1
+    Topic 1
+        Subtopic 1 cat1_top1_sub1.html
+        Subtopic 2 cat1_top1_sub2.html
+    Topic 2
+        Subtopic 1 cat1_top2_sub1.html
+        Subtopic 2 cat1_top2_sub2.html
+Category 2
+    ...
+Category 3
+    ...
+
+For the Microware site, perhaps this would be close to what it would
+look like:
+
+68K
+    App Notes
+        Compiler: Ultra-C ultracnotes.html
+        Compiler: K&R knrnotes.html
+        Networking: ISP ispnotes.html
+        Networking: SoftStax softstaxnotes.html
+        Tutorials tutorials.html
+    Downloads
+        Utilities
+            PC Hosted pchosted.html
+            Unix Hosted unixhosted.html
+            OS-9 Hosted os9hosted.html
+    Patches/Updates
+        Year 2K "setime" 68k_setime_y2k.zip
+        Year 2K "date" 68k_date_y2k.zip
+        Year 2K "PCF" 68k_pcf_y2k.zip
+        PCF Ed#27 to Ed#35 pcf_27_35.zip
+PowerPC
+    ...
+SH3
+    ...
+StrongARM
+    ...
+x86
+    ...

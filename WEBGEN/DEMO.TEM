@@ -1,0 +1,12 @@
+<html>
+<title>WebVenture Generator Sample</title>
+<img src=IMAGE.jpg>
+<hr>
+<a href=FORWARD.htm> Click here to move Forward </a>
+<a href=BACK.htm> Click here to move Back </a>
+<a href=MOVEL.htm> Click here to Move Left </a>
+<a href=MOVER.htm> Click here to Move Right </a>
+<a href=TURNLEFT.htm> Click here to Turn Left </a>
+<a href=TURNRIGHT.htm> Click here to Turn Right </a>
+<a href=TURNAROUND.htm> Click here to Turn Around </a>
+</html>

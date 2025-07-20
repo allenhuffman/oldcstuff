@@ -1,0 +1,7 @@
+#define SPAM
+<!-- TEMPLATE START -->
+#ifdef DEBUG
+This is a debug line.
+#endif
+...done.
+<!-- TEMPLATE END -->

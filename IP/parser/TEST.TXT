@@ -1,0 +1,24 @@
+site1   username1   password1   dir1    a   srcfile1    dstfile1
+site2   username2   password2   dir2    b   srcfile2    dstfile2
+site3   username3   password3   dir3    a   srcfile3    dstfile3
+site4   
+        [
+        username4   password4   dir4    a   srcfile4    dstfile4
+        username5   password5   dir5    a   srcfile5    dstfile5
+        testname    testpswd    
+                                [
+                                dir1    a   
+                                            [
+                                            testsrc1    testdst1
+                                            asciisrc2   asciidst2
+                                            asciisrc3   asciidst3
+                                            asciisrc4   asciidst4
+                                            ]
+                                dir2    a   testsrc2    testdst2
+                                dir3    b   testsrc3    testdst3
+                                ]
+        username6   password6   dir6    a   srcfile6    dstfile6
+        ]
+site5   username7   password7   dir7    b   srcfile7    dstfile7
+site6   username8   password8   dir8    b   srcfile8    dstfile8
+

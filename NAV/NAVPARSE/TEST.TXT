@@ -1,0 +1,26 @@
+Category_1
+[
+    Topic_1
+    [
+        Subtopic_1
+        [
+            Item_1
+            Item_2
+            Item_3
+        ]
+        Subtopic_2
+        [
+            Item_1
+            Item_2
+            Item_3
+        ]
+    ]
+    Topic_2
+    [
+        Subtopic_1
+        Subtopic_2
+    ]
+]
+Category_2
+Category_3
+

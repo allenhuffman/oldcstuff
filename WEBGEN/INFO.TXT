@@ -1,0 +1,102 @@
+My former project is the WebVenture Generator
+
+It allows easy creation of virtual "tour" HTML pages.  All you have to
+do is provide image files, an .html template, and a map file and it does
+the rest.
+
+Suppose you have a five location "area" such as this:
+
+       [ 1 ] --- [ 2 ]
+         |         |
+       [ 3 ] --- [ 4 ] --- [ 5 ]
+
+Each room will require four image files, one for each direction you can be
+facing.  All files used will contain the same "root" name, such as "GAME_".
+The image files would therefore end up being called:
+
+        GAME_01N.JPG - image for room 1 when facing North
+        GAME_01S.JPG - image for room 1 when facing South
+        GAME_01W.JPG - image for room 1 when facing West
+        GAME_01E.JPG - image for room 1 when facing East
+
+A map file is also required which shows how the rooms are connected.  The
+lines of the file contain the room number you would be in if you went in
+the corresponding direction.  0 means there is no room in that direction.
+
+        GAME_.MAP file:
+	*
+	* This is a sample .map file
+	* (Formate: "n,s,w,e")
+	*
+        0,3,0,2	* room 1, East goes to room 2, South goes to room 3
+        0,4,1,0	* room 2, South goes to Room 4, West goes to room 1
+        1,0,0,4	* room 3, North goes to room 1, East goes to room 4
+        2,0,3,5	* room 4, North goes to 2, East goes to 5, West goes to 3
+        0,0,4,0	* room 5, West goes to room 4
+
+The map file can also now contain "overrides" which specify alternate image
+files for each room direction, as well as room description text.  A sample
+might look like this:
+
+	*
+	1,2,3,4	* Room direction data
+		IMAGES=door,wall,wall,wall
+		DESC=You are in a room with a door on the North wall.
+	*
+
+In this example, when facing North, the image file "door" would be shown.
+All other directions would show the "wall" image file.  This allows you
+to have "generic" images used rather than requiring actual distinct
+images for each location and each direction.
+
+Finally, there is a template HTML file required which will be used to
+generate all the new files.  You make a standard HTML file but include
+certain "keywords" which will be replaced by the appropriate code in the
+new pages.  For example:
+
+        IMAGE - gets replaced by the image name for the current room
+        FACING - inserts direction you are facing for that room ("North")
+        DESCRIPTION - puts in a special room description from the map file
+        MOVEL - the html page for the room left of where you are
+        MOVER - the html page for the room right of where you are
+        FORWARD - the html page for the room in front of you
+        BACK - the html page for the room behind you
+        TURNLEFT - the html page for the same room, but facing to the left
+        TURNRIGHT - the html page for the same room, but facing to the right
+        TURNAROUND - the html page for the same room, but facing behind you
+
+The program will omit any line containing a keyword that doesn't apply.
+For example, if the current location has no "room" in front of it (i.e., you
+cannot move FORWARD), it won't put the line with that keyword in the
+output file.  For this reason it is important to ensure that all keyword
+lines which may be omitted in this manner contain NO OTHER html code that
+will need to be there.  Consider this example:
+
+        <html>
+        <img src=IMAGE.jpg>
+        <a href=FORWARD.htm> Click here to move Forward </a>
+        <a href=BACK.htm> Click here to move Back </a>
+        <a href=MOVEL.htm> Click here to Move Left </a>
+        <a href=MOVER.htm> Click here to Move Right </a>
+        <a href=TURNLEFT.htm> Click here to Turn Left </a>
+        <a href=TURNRIGHT.htm> Click here to Turn Right </a>
+        <a href=TURNAROUND.htm> Click here to Turn Around </a>
+        </html>
+
+This might produce the following code for Room 1 of this "area":
+
+        <html>
+        <img src=GAME_01N.jpg>
+            *** this line omitted since there is no room FORWARD from here ***
+        <a href=GAME_03N.htm> Click here to move Back </a>
+            *** this line omitted since there is no room LEFT from here ***
+        <a href=GAME_02N.htm> Click here to Move Right </a>
+        <a href=GAME_01W.htm> Click here to Turn Left </a>
+        <a href=GAME_01E.htm> Click here to Turn Right </a>
+        <a href=GAME_01S.htm> Click here to Turn Around </a>
+        </html>
+
+Hopefully you get the idea.  I will try to have a better explanation here
+in the near future.  In the meantime, if you think this program might be
+of use to you, drop me a note!
+

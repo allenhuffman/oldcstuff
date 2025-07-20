@@ -1,0 +1,224 @@
+#define VER "1.06"
+/*---------------------------------------------------------------------------|
+| Rootname v1.06 by Allen Huffman (subetha@pobox.com)                        |
+| Copyright (C) 1996,97 by Sub-Etha Software                                 |
+| (www.pobox.com/~subetha/programs.html)                                     |
+|----------------------------------------------------------------------------|
+| Syntax: dir | rootname -z {basename}                                       |
+|         rootname {basename}                                                |
+|         rootname -z {basename} < {dirfile.txt}                             |
+| Usage : DOS batch root filename renamer filter.                            |
+| Opts  : -? or /? = display this message.                                   |
+|         -z or /z = read directory output from standard input (filter).     |
+|         {basename} is the required root name the files will have.          |
+|----------------------------------------------------------------------------|
+|       DOS batch file renamer.  Takes a "root" name then renames all files  |
+| in the directory output to that root plus an incrementing 2 digit number.  |
+| I wrote this for renaming EZPhoto image files, which comes out with names  |
+| like "AUG23_01.JPG", "AUG23_02.JPG".  This utility can be used to rename   |
+| them to "MYCATS00.JPG", "MYCATS01.JPG", etc.                               |
+|                                                                            |
+| Since this is just a filter, it poses no threat to damaging the directory  |
+| other than renaming files, which is the only shell command it forks.       |
+|                                                                            |
+| COMPILING NOTE:  This source defaults to compile in "debug mode" unless    |
+| you pass in/define "NODEBUG", ie "cc -dNODEBUG dirver.c" to generate the   |
+| actual "working" version.                                                  |
+|----------------------------------------------------------------------------|
+| Ed #    Date      What Happened                                       Who  |
+|  --   --------    ------------------------------------------------    ---  |
+|  01   96/10/06    Created                                             ach  |
+|  02   96/10/09    Properly declared usage() function and prototye          |
+|                   Included proper include files for functions              |
+|                   ptr variable removed (defined but not used warning)      |
+|                   Renamed itoa to iton to work with MIX Power C       tc   |
+|  03   96/10/09    Code cleanup and more comments.                     ach  |
+|  04   96/10/23    Debug updates, startup output, and bacon.           ach  |
+|  05   96/12/19    Updated header, added "-z" and "auto" modes.        ach  |
+|  06   97/09/03    More code cleanup.                                  ach  |
+|---------------------------------------------------------------------------*/
+ 
+#include <stdio.h>
+#include <stdlib.h> 
+#include <string.h>
+#include <ctype.h>
+ 
+#define MAXLEN 80 /* max dir line length to accept */
+#define WINLEN 80 /* won't work on win names longer than this :) */
+#define ROOTMAX 9
+
+#define TRUE 0
+#define FALSE 1
+ 
+/*-----------------------------------------|
+| Useless prototypes/function declarations |
+| to make ANAL ANSI compilers happy.       |
+|-----------------------------------------*/
+void usage(void);
+int append_number( char*, int );
+ 
+int main( int argc, char *argv[] )
+{
+    char    line[MAXLEN];
+    char    dosname[13];
+    char    newname[13];
+    char    cmd[80];
+    char    root[ROOTMAX];
+    int     count = 1;
+    int     i;
+    char    doit = FALSE;
+
+    if ( argc == 1 ) { /* no options? */
+        usage();
+        return EXIT_FAILURE;
+    }
+
+    for ( i=1 ; i<argc ; i++ ) {
+        if ( argv[i][0] == '-' || argv[i][0] == '/' ) { /* option found! */
+            switch( toupper(argv[i][1]) ) {
+                case '?': /* request for help? */
+                case 'H':
+                    usage();
+                    return EXIT_SUCCESS;
+                case 'Z': /* filter mode? */
+                    doit = TRUE;
+                    break;
+                default:
+                    fputs( "\nUnrecognized option: ", stderr );
+                    fputs( argv[i], stderr );
+                    fputs( "\n", stderr );
+                    usage();
+                    return EXIT_FAILURE;
+            }
+        } else { /* else, not an option, must be {basename} */
+            strncpy( root, argv[i], ROOTMAX );
+        }
+    }
+    if ( (root != NULL) && (doit == FALSE) ) { /* just a rootname line? */
+#ifdef _OS9000
+        strcpy( line, "dir ! " );
+#else
+        strcpy( line, "dir | " );
+#endif
+        strcat( line, argv[0] );
+        strcat( line, " -z " );
+        strcat( line, root );
+        i = system( line );
+        return( i );        
+    }
+    if ( doit != TRUE ) { /* if we aren't in auto mode, we can bail */
+        usage();
+        return EXIT_FAILURE;
+    }
+
+    fputs( "rootname:  Now reading directory output.\n", stderr );
+    fputs( "           Attempting to rename files to base of '", stderr );
+    fputs( root, stderr );
+    fputs( "'.\n", stderr );
+ 
+    /*--------------------------------------------------|
+    | Read as many lines as we can from standard input. |
+    |--------------------------------------------------*/
+    while (!feof( stdin )) {
+        fgets( line, MAXLEN+1, stdin );         /* read line from stdin */
+ 
+        if ( strlen(line)<44 ) continue;        /* ignore short lines */
+ 
+        line[strlen(line)-1] = '\0';            /* convert CR into a NULL */
+ 
+        /*----------------------------------------------------|
+        | Check to see if the line contains filename entries. |
+        |----------------------------------------------------*/
+        if (( line[39] == ':' ) && ( line[15] != '<' )) {
+ 
+            /*--------------------------------|
+            | Build existing DOS name string. |
+            |--------------------------------*/
+            i = strcspn( line, " " );           /* find first space */
+            strncpy( dosname, line, i );        /* copy up to the space */
+            dosname[i] = '\0';                  /* NULL terminate */
+            strcat( dosname, "." );             /* append "." */
+            strncat( dosname, line+9, 3 );      /* append extension */
+ 
+            /*---------------------------|
+            | Build the new name string. |
+            |---------------------------*/
+            strcpy( newname, root );            /* copy "root" name */
+            append_number( newname, count );    /* append number */
+ 
+            strcat( newname, "." );             /* append "." */
+            strncat( newname, line+9, 3 );      /* append extension */
+ 
+#ifndef NODEBUG
+            printf("----- fork:\n");
+            printf("      rename %s %s\n", dosname, newname);
+#else
+            /*--------------------------|
+            | Fork the rename commands. |
+            |--------------------------*/
+            strcpy( cmd, "rename " );           /* build command line */
+            strcat( cmd, dosname );
+            strcat( cmd, " " );
+            strcat( cmd, newname );
+            i = system( cmd ); /* forgive me, father, for I have sinned... */
+            if ( i != 0 ) exit( i );
+#endif
+            count++;                            /* increment counter :) */
+        }
+    }
+#ifndef NODEBUG
+    printf( "%d directory entries processed.\n", count );
+#endif
+ 
+    return EXIT_SUCCESS;
+}
+
+/*-----------------------------------------------------------|
+| Appends string of number to end of string.  It is caller's |
+| responsibility to ensure enough string space exists!       |
+|-----------------------------------------------------------*/
+int append_number( char *name, int num )
+{
+    char    *ptr;
+    int     val;
+    
+    ptr = name + strlen(name);  /* start pointing to string */
+
+    while( num > 9999 ) return -1; /* we have our limits! */
+
+    val = 1000;
+    while( val > num ) val = val / 10; /* find range */
+
+    while( val > 0 ) {
+        *ptr = '0';
+        while( num >= val ) {
+            (*ptr)++;
+            num = num - val;
+        }
+        val = val / 10;
+        ptr++;
+    }
+    *ptr = '\0'; /* NULL terminate */
+
+    return EXIT_SUCCESS;
+}
+
+void usage(void)
+{
+    fputs( "\n"
+           "rootname v"VER" by Allen Huffman (subetha@pobox.com)\n"
+           "Copyright (C) 1996 by Sub-Etha Software (www.pobox.com/~subetha/programs.html)\n"
+           "\n", stdout );
+    fputs( "Syntax: dir | rootname -z {basename}\n"
+           "        rootname {basename}\n"
+           "        rootname -z {basename} < {dirfile.txt}\n"
+           "Usage : DOS batch root filename renamer filter.\n"
+           "Opts  : -? or /? = display this message.\n", stdout );
+    fputs( "        -z or /z = read directory output from standard input (filter).\n"
+           "        {basename} is the required root name the files will have.\n"
+#ifndef NODEBUG
+          "\n"
+          "*** DEBUG VERSION ***\n"
+#endif
+          , stdout );
+}
